@@ -1,0 +1,39 @@
+language: julia
+os:
+  - linux
+julia:
+  - 1.0
+notifications:
+  email: false
+git:
+  depth: 99999999
+cache:
+  timeout: 1000
+  directories:
+    - downloads
+env:
+  global:
+    - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+    - BINARYBUILDER_AUTOMATIC_APPLE=false
+sudo: required
+
+# Before anything else, get the latest versions of things
+before_script:
+  - julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
+
+script:
+  - julia build_tarballs.jl
+
+
+deploy:
+    provider: releases
+    api_key:
+        # Note; this api_key is only valid for jstrube/Geant4Builder; you need
+        # to make your own: https://docs.travis-ci.com/user/deployment/releases/
+        secure: Fe8/GJgzPZVefKSvw4fuLU+Qja+9wq701hYrSR8fh9DOZoe5EgQpacIFQ6mOmDxDSrA22BJaWNlIJhyufgDUsw5ZSA10AfbZjjDmb073muhZOElMnbLVvYvMLdB1C1fRozMeh3/YU6dg1apyvMARJs3iq1FQSPOXt4Q3iHNg8QoKITUOw4JcLCLY+bPvspGvtt07Qkkd+U/uMq9K3xCcYvinZlQuFz7OSg2k/Vi1m4TiOFhbVMB7FT0ARx4R4c+zgVWgVYFMjbru8uq2NW3Fge23uJ6NcdyYBPVgBSKwAhHBduUQtSqyntTvtt+X2k0dQj1jMs9HVBVIKOcwdJ/YyKxyiMLOhFjGftw3r1T0xavrPyUwabm0HH6/Bq4COO2Wq6DTTT8wUZ9f4R4z36DfX+naUP7cxmJMZKHYYZ8DT+2SeObvllT/uVW/+5A6tEyg3zF5Sf/rFAn4r/obCQmCQUqSegmTGB6aik/H38MNMz8OV9Sqwp0dui39LqIkq878AK+V0lgvT3GHLI80apn9ZoF6OBKK68DTD/2fpQNonDASCZjhz7/iQSRBfWczXAw3tcmOMJskmeehXeO/hhWgV+1DVyv9oAsuqsEA+c8jxN7/hATYWU3WxE5TLFdILCD3meeCY+fsEbEM6YIwpjEdaIAvqtQDCb9wFYqGWVyrx3M=
+    file_glob: true
+    file: products/*
+    skip_cleanup: true
+    on:
+        repo: jstrube/Geant4Builder
+        tags: true
